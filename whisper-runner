@@ -1,0 +1,87 @@
+#!/bin/zsh
+# Whisper Runner - Simple wrapper for OpenAI Whisper
+# Usage: whisper-runner <video_file> [options]
+# Default options: --model large --language Chinese --output_format srt
+
+# Default values
+MODEL="large"
+LANGUAGE="Chinese"
+OUTPUT_FORMAT="srt"
+OUTPUT_DIR="."
+
+# Function to show usage
+usage() {
+    echo "Usage: whisper-runner <video_file> [options]"
+    echo ""
+    echo "Arguments:"
+    echo "  video_file    Path to the video/audio file to transcribe"
+    echo ""
+    echo "Options:"
+    echo "  -m, --model MODEL        Whisper model (tiny/base/small/medium/large) [default: large]"
+    echo "  -l, --language LANGUAGE  Language [default: Chinese]"
+    echo "  -o, --output FORMAT      Output format (srt/vtt/txt/json) [default: srt]"
+    echo "  -d, --output-dir DIR     Output directory [default: current]"
+    echo "  -h, --help               Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  whisper-runner ./video.mp4"
+    echo "  whisper-runner ./video.mp4 --model medium --language English"
+    echo "  whisper-runner ./video.mp4 -o txt"
+    exit 1
+}
+
+# Parse arguments
+if [ $# -eq 0 ]; then
+    usage
+fi
+
+VIDEO_FILE="$1"
+shift
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -m|--model)
+            MODEL="$2"
+            shift 2
+            ;;
+        -l|--language)
+            LANGUAGE="$2"
+            shift 2
+            ;;
+        -o|--output)
+            OUTPUT_FORMAT="$2"
+            shift 2
+            ;;
+        -d|--output-dir)
+            OUTPUT_DIR="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            ;;
+    esac
+done
+
+# Check if video file exists
+if [ ! -f "$VIDEO_FILE" ]; then
+    echo "Error: File '$VIDEO_FILE' not found"
+    exit 1
+fi
+
+# Run whisper with micromamba
+echo "Running whisper on: $VIDEO_FILE"
+echo "Model: $MODEL, Language: $LANGUAGE, Format: $OUTPUT_FORMAT"
+echo ""
+
+micromamba run -n dev whisper "$VIDEO_FILE" \
+    --model "$MODEL" \
+    --language "$LANGUAGE" \
+    --output_format "$OUTPUT_FORMAT" \
+    --output_dir "$OUTPUT_DIR"
+
+echo ""
+echo "Done! Output saved to: $OUTPUT_DIR"
