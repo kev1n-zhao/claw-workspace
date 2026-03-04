@@ -72,6 +72,9 @@ if [ ! -f "$VIDEO_FILE" ]; then
     exit 1
 fi
 
+# Output to same directory as input video
+OUTPUT_DIR=$(dirname "$VIDEO_FILE")
+
 # Run whisper with micromamba
 echo "Running whisper on: $VIDEO_FILE"
 echo "Model: $MODEL, Language: $LANGUAGE, Format: $OUTPUT_FORMAT"

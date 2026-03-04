@@ -17,11 +17,16 @@ whisper() {
         return 1
     fi
     
+    # Get directory of input file
+    local output_dir
+    output_dir=$(dirname "$video_file")
+    
     # Run with micromamba
     micromamba run -n dev whisper "$video_file" \
         --model large \
         --language Chinese \
         --output_format srt \
+        --output_dir "$output_dir" \
         "${@:2}"
 }
 
